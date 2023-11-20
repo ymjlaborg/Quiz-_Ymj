@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Test : MonoBehaviour
@@ -11,14 +12,26 @@ public class Test : MonoBehaviour
     {   
        
 
-    
-            Transition.SetTrigger("Start");
-            Transition.SetBool("Return", true);
+            gameObject.SetActive(true);
+            Transition.SetBool("Start&End", true);
+            //자기 자신의 오브젝트를 비활성화 시킨다.
+            //3초후 QuizStart 함수를 실행한다.
+            Invoke("QuizStart", 3f); //
+            
+            
             
         
         
 
         
 
+    }
+
+
+    public void QuizStart()
+    {
+        Transition.SetBool("Start&End", false);
+        //1초후 Npc_Tuto.instance.QuizStart(); 실행한다.
+        Npc_Tuto.instance.QuizStart();
     }
 }
