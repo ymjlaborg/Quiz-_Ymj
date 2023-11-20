@@ -21,13 +21,13 @@ public class LanguageSingleton : MonoBehaviour
     {
         
         GetLang(); //언어파일을 불러온다.
-        // if (instance == null)
-        // {
-        //     instance = this;
-        //     DontDestroyOnLoad(this);
-        // }
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this);
+        }
 
-        // else Destroy(this);
+        else Destroy(this);
 
         InitLang();
     }

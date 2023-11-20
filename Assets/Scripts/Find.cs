@@ -19,7 +19,7 @@ public class Find : MonoBehaviour
                    Debug.Log("Player 오브젝트를 찾을 수 없습니다.");
                    } 
  
-        PlayerSingleton.instance.test = player;
+        
     }
    
    // 다른 스크립트에서 findeplayer를 실행시키는 코드는 아래와 같음

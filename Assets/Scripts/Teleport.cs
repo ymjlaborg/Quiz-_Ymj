@@ -39,29 +39,9 @@ public class Teleport : MonoBehaviour
        
     }
 
-    public void findeplayer()
-    {
-        
-       GameObject player = GameObject.FindWithTag("Player");
-         if (player != null) {
-    // Player 오브젝트를 찾았으므로 여기에 로직을 추가합니다.
-           } else {
-                   Debug.Log("Player 오브젝트를 찾을 수 없습니다.");
-                   } 
- 
-        PlayerSingleton.instance.test = player;
-    }
-
-
-    public void TeleportPlayer(int poi)
-    {
-        findeplayer();
-        Debug.Log("플레이어 위치 이동");
-        PlayerSingleton.instance.TeleportPlayer(pos[poi].transform.position);
-
-
     
-    }
+
+
        
 
 
