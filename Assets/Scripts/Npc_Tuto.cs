@@ -107,7 +107,7 @@ public void Start_main()
 System.Random random = new System.Random();  // 랜덤 객체 생성
 value1 = new int[1];  // 한 개의 요소를 저장할 수 있는 배열 생성
 value1[0] = random.Next(0, 3);  // 0부터 4까지의 랜덤한 정수 생성 후 배열에 저장
-tmpInputFields.onEndEdit.AddListener(SubmitInput);
+tmpInputFields.onEndEdit.AddListener(SubmitInput); // inputfield에 SubmitInput 함수 연결
 //skip_button 오브젝트 이미지 투명도 0으로 설정
 
 
@@ -356,7 +356,7 @@ public void Typing_start() {
           text2.color = new Color(255, 255, 255, 255);
           point_text.color = new Color(255, 255, 255, 255);
           time_text.color = new Color(255, 255, 255, 255);
-
+          tmpInputFields.gameObject.SetActive(true);
           m_Message2 = LanguageSingleton.instance.Langs[lang].langLocalize;
          text2.text =  m_Message2;
 
@@ -377,16 +377,16 @@ public void Typing_start() {
           
            int lastElement = value1[value1.Length - 1];
            string correct = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
+            Debug.Log("correct: " + correct);
            
 
             if (arg0 == correct)
         {
             Debug.Log("정답");
-            point += 2;
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "정답입니다. 3초후 메인화면으로 돌아갑니다";
             //3초후 메인화면으로 돌아감
-            Invoke("Reset", 3f);
+            Invoke("Reset", 7f);
          
             
         }
@@ -396,7 +396,7 @@ public void Typing_start() {
             point -= 4;
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "오답입니다.";
-            Invoke("Typing_start", 2f);
+            Invoke("Typing_start", 5f);
         }
 
     }
@@ -405,6 +405,11 @@ public void Typing_start() {
     {
         //씬 리셋
         UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+    }
+
+    public void Check_apply()
+    {
+      SubmitInput(tmpInputFields.text);
     }
 
 }
