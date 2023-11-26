@@ -7,6 +7,7 @@ using System;
 using UnityEngine.AI;
 using System.Security;
 using Unity.VisualScripting;
+using UnityEngine.Timeline;
 
 
 
@@ -16,6 +17,8 @@ public class Npc_Tuto : MonoBehaviour
 
  public string m_Message; // 텍스트를 저장할 변수
  public string m_Message2;
+
+
 
  public int lang = 3;
 
@@ -58,6 +61,10 @@ public class Npc_Tuto : MonoBehaviour
 
   public LangArray[] LangArrays;
 
+  public AudioClip[] AudioClips;
+
+  private AudioSource AudioSources;
+
   
 
 
@@ -76,6 +83,12 @@ public class Npc_Tuto : MonoBehaviour
   private bool Quiz_Round;
 
   int point = 22;
+
+  private bool answer;
+
+  private bool Bgm = true;
+
+  
 
 
 
@@ -108,8 +121,10 @@ System.Random random = new System.Random();  // 랜덤 객체 생성
 value1 = new int[1];  // 한 개의 요소를 저장할 수 있는 배열 생성
 value1[0] = random.Next(0, 3);  // 0부터 4까지의 랜덤한 정수 생성 후 배열에 저장
 tmpInputFields.onEndEdit.AddListener(SubmitInput); // inputfield에 SubmitInput 함수 연결
+AudioSources = GetComponent<AudioSource>();
 //skip_button 오브젝트 이미지 투명도 0으로 설정
-
+//AudioClips의 첫번째 요소를 재생
+AudioPlaya(0);
 
  Quiztime = 45;
 Typing_start(); 
@@ -117,10 +132,11 @@ Typing_start();
 
 
 
+
 public void Typing_start() {  
     
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-         
+         answer = true;
       Debug.Log("Typing_start: i = " + text_i + ", value1.Length = " + value1.Length);
       // i가 value1의 길이보다 작을때까지 반복하고 i를 1씩 증가시킨다 만약 i가 value1의 길이보다 크면 UI를 비활성화
         if (text_i < value1.Length) {
@@ -254,7 +270,7 @@ public void Typing_start() {
   }
 
   time_text.text = "시간 초과";
-  Typing_start();
+   StartCoroutine(WaitAndRestart());
       
 
     }
@@ -295,9 +311,11 @@ public void Typing_start() {
 
     public void NextQuiz()
     { 
+       
       isStart = false;
        StopCoroutine(Timeset(Quiztime)); 
        StartCoroutine(WaitAndRestart());
+     
       
       
     }
@@ -324,6 +342,7 @@ public void Typing_start() {
         button.SetActive(false);
         Quiz_Round = true;
        text = Quiz_text;
+       
 
         //text2 활성화
         text2.gameObject.SetActive(true);
@@ -360,9 +379,11 @@ public void Typing_start() {
           m_Message2 = LanguageSingleton.instance.Langs[lang].langLocalize;
          text2.text =  m_Message2;
 
-         
+           AudioPlaya(1);
 
            text_i = 0;
+           
+
       NextQuiz();
       
     } 
@@ -373,8 +394,8 @@ public void Typing_start() {
 
     public void SubmitInput(string arg0)
     {
-
-          
+          if(answer == true)
+          {
            int lastElement = value1[value1.Length - 1];
            string correct = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
             Debug.Log("correct: " + correct);
@@ -383,9 +404,13 @@ public void Typing_start() {
             if (arg0 == correct)
         {
             Debug.Log("정답");
+             istyping = false;
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "정답입니다. 3초후 메인화면으로 돌아갑니다";
             //3초후 메인화면으로 돌아감
+            isStart = false;
+            StopCoroutine(Timeset(Quiztime)); 
+            answer = false;
             Invoke("Reset", 7f);
          
             
@@ -394,10 +419,14 @@ public void Typing_start() {
         {
             Debug.Log("오답");
             point -= 4;
+            
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "오답입니다.";
+             
+            answer = false;
             Invoke("Typing_start", 5f);
         }
+          }
 
     }
 
@@ -411,6 +440,15 @@ public void Typing_start() {
     {
       SubmitInput(tmpInputFields.text);
     }
+
+    public void AudioPlaya(int index)
+    {   
+        
+        AudioSources.clip = AudioClips[index];
+        Debug.Log(AudioSources.clip);
+        AudioSources.Play();
+
+    }     
 
 }
 
