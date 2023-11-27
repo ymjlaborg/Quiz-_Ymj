@@ -10,8 +10,16 @@ public class Player : MonoBehaviour
 
 
     //만약 플레이어가 2D 콜라이더에 닿았다면, NPC_TUTO를 찾아서 대화창을 띄워준다.
-    public void OnTriggerEnter2D(Collider2D collision)
+    public void Start_land()
     {
         Npc_Tuto.instance.Start_main();
+    }
+
+
+    // 스타트 함수 실행 
+    public void Start()
+    {
+        //인보크 함수를 사용해서 3초후에 Start_land 함수를 실행한다.
+        Invoke("Start_land", 3f);
     }
 }
