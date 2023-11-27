@@ -65,7 +65,9 @@ public class Npc_Tuto : MonoBehaviour
 
   private AudioSource AudioSources;
 
-  
+  private bool Corrects = false;
+
+  private bool Submit;
 
 
   //inputfield 변수
@@ -80,9 +82,10 @@ public class Npc_Tuto : MonoBehaviour
 
   public GameObject apply;
 
-  private bool Quiz_Round;
+  private bool Quiz_Round = false;
 
-  int point = 22;
+  private bool Quiz_Start;
+  int point = 20;
 
   private bool answer;
 
@@ -141,34 +144,26 @@ public void Typing_start() {
       // i가 value1의 길이보다 작을때까지 반복하고 i를 1씩 증가시킨다 만약 i가 value1의 길이보다 크면 UI를 비활성화
         if (text_i < value1.Length) {
             m_Message = LanguageSingleton.instance.Langs[lang].value[value1[text_i]].Replace("/", "\n");
-            
-            //타이머 코루틴 실행
-            
-            
-            
-            Debug.Log("m_Message: " + m_Message);
-
           
-            
+
             StartCoroutine(Typing(text, m_Message, m_Speed));
 
           
             
              if(Quiz_Round == true) {
-                if(text_i > 1) 
-                { 
-                  //처음 호출된 거라면 포인트 차감을 하지 않는다.
-
-
-                  point -= 2;
-                 point_text.text =  "획득 가능 포인트 : " + point;
                 
+                if(Quiz_Start == true){
+                 point_text.text =  "획득 가능 포인트 : " + point;
+                    StartCoroutine(Timeset(Quiztime));   
                  Debug.Log("라운드 점수 및 타이머 리셋" );
-                  
+                  Quiz_Start = false;
                 }
-                else
-                {
-                   point -= 2;
+              else 
+                { 
+                 
+                      point -= 2;
+                  
+                 
                 if (text_i >= value1.Length) point = 2; // i가 value1의 길이보다 크면 point를 2로 설정
 
                 point_text.text =  "획득 가능 포인트 : " + point;
@@ -177,18 +172,13 @@ public void Typing_start() {
                 
                 }
                 
-
-
+                }
+             
                
                 //45초 타이머
                 text_i++;
 
-
-        
-                
-            }
-
-            
+                            
            
            
         } else if( text_i >= value1.Length ) { // i가 value1의 길이보다 크면 UI를 비활성화
@@ -205,7 +195,7 @@ public void Typing_start() {
             }
            
             
-            
+         
           //if()에서 그리고는 &&로 바꾸기
             
         }
@@ -221,7 +211,7 @@ public void Typing_start() {
 
           if(point == 2) {
                     //value1.Length의 마지막 값 호출 
-                 int lastElement = value1[value1.Length - 1];
+                 int lastElement = value1[value1.Length - 1]; 
                  m_Message = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
                  text.text = " 정답은 : " + m_Message;
                  Debug.Log("정답");
@@ -312,12 +302,13 @@ public void Typing_start() {
     public void NextQuiz()
     { 
        
-      isStart = false;
-       StopCoroutine(Timeset(Quiztime)); 
-       StartCoroutine(WaitAndRestart());
-     
+      // isStart = false;
+      //  StopCoroutine(Timeset(Quiztime)); 
+      //  StartCoroutine(WaitAndRestart());
+       
+        Typing_start();
       
-      
+       
     }
 
     IEnumerator WaitAndRestart()
@@ -326,7 +317,7 @@ public void Typing_start() {
   Quiztime = 45;
   time_text.text = "남은 시간 : " + Mathf.Round(Quiztime);
   StartCoroutine(Timeset(Quiztime));
-  Typing_start();
+
 }
     
 
@@ -341,6 +332,7 @@ public void Typing_start() {
         next.SetActive(true);
         button.SetActive(false);
         Quiz_Round = true;
+        Quiz_Start = true;
        text = Quiz_text;
        
 
@@ -366,8 +358,8 @@ public void Typing_start() {
         {
             int j = rnd.Next(i + 1);
             int temp = value1[i];
-            value1[i] = value1[j];
-            value1[j] = temp;
+            value1[i] = value1[j]; // value1[i]와 value1[j]의 값을 서로 바꾸며 value
+            value1[j] = temp; // value1[j]의 값을 temp로 바꿈
         }
          skip_button.GetComponent<Image>().color = new Color(1, 1, 1, 0);
          //text의 vertex color를 0으로 설정
@@ -392,11 +384,11 @@ public void Typing_start() {
 
 
 
-    public void SubmitInput(string arg0)
-    {
+    public void SubmitInput(string arg0) //SubmitInput 함수
+    {     Submit = true;
           if(answer == true)
           {
-           int lastElement = value1[value1.Length - 1];
+           int lastElement = value1[value1.Length - 1];// 
            string correct = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
             Debug.Log("correct: " + correct);
            
@@ -406,6 +398,7 @@ public void Typing_start() {
             Debug.Log("정답");
              istyping = false;
             point_text.text = "획득 가능 포인트 : " + point;
+            Corrects = true;
             text.text = "정답입니다. 3초후 메인화면으로 돌아갑니다";
             //3초후 메인화면으로 돌아감
             isStart = false;
@@ -419,12 +412,15 @@ public void Typing_start() {
         {
             Debug.Log("오답");
             point -= 4;
-            
+            Corrects = false;
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "오답입니다.";
-             
+             isStart = false;
+            StopCoroutine(Timeset(Quiztime)); 
             answer = false;
             Invoke("Typing_start", 5f);
+             
+           
         }
           }
 

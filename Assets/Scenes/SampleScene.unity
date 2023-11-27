@@ -1493,6 +1493,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Transition: {fileID: 681580132}
   Particle: {fileID: 2195150983140372362}
+  audioSource: {fileID: 3740090990043504752}
+  audioClip: {fileID: 8300000, guid: be885d34d31489643b909ec4476171dc, type: 3}
 --- !u!1 &714222762
 GameObject:
   m_ObjectHideFlags: 0
@@ -13572,7 +13574,7 @@ MonoBehaviour:
     Genre: 00000000
   AudioClips:
   - {fileID: 8300000, guid: 3aee2c17a0c25c347ae49722506042ea, type: 3}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: 77666eb71af92774194e0c7df50875f7, type: 3}
   tmpInputFields: {fileID: 1021653862}
   Number: 0
   next: {fileID: 1698191199}
