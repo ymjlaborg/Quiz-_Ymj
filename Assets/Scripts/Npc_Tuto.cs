@@ -65,7 +65,7 @@ public class Npc_Tuto : MonoBehaviour
 
   private AudioSource AudioSources;
 
-  private bool Corrects = false;
+  private bool Quizing;
 
   private bool Submit;
 
@@ -85,12 +85,13 @@ public class Npc_Tuto : MonoBehaviour
   private bool Quiz_Round = false;
 
   private bool Quiz_Start;
-  int point = 20;
+  int point = 18;
 
   private bool answer;
 
   private bool Bgm = true;
-
+  
+  private int Quiz_rount = 0;
   
 
 
@@ -142,7 +143,7 @@ public void Typing_start() {
          answer = true;
       Debug.Log("Typing_start: i = " + text_i + ", value1.Length = " + value1.Length);
       // i가 value1의 길이보다 작을때까지 반복하고 i를 1씩 증가시킨다 만약 i가 value1의 길이보다 크면 UI를 비활성화
-        if (text_i < value1.Length) {
+        if (text_i < value1.Length-Quiz_rount) { //value1.Length에서 맨 마지막 요소를 뺌
             m_Message = LanguageSingleton.instance.Langs[lang].value[value1[text_i]].Replace("/", "\n");
           
 
@@ -158,17 +159,32 @@ public void Typing_start() {
                  Debug.Log("라운드 점수 및 타이머 리셋" );
                   Quiz_Start = false;
                 }
-              else 
+              else
                 { 
-                 
-                      point -= 2;
+                 StartCoroutine(Timeset(Quiztime));  
+                  
+                  if(Quizing == false){ // 정답을 맞췄을때
+                       point -=2;
+                      point_text.text =  "획득 가능 포인트 : " + point;
+                      
+                  }
+                  else // 정답을 틀렸을때
+                  {
+                    
+                    point_text.text =  "획득 가능 포인트 : " + point;
+                    Quizing = false;
+                  }
                   
                  
-                if (text_i >= value1.Length) point = 2; // i가 value1의 길이보다 크면 point를 2로 설정
+                if (point <= 0)
+                {     point = 2;
+                      point_text.text =  "기본 포인트 : " + point + " 를 획득하셨습니다. 곧 메인 화면으로 넘어갑니다.";
+                Debug.Log("포인트 0이하");
+                Invoke("Reset", 3f);
 
-                point_text.text =  "획득 가능 포인트 : " + point;
-                Debug.Log("최저 점수" + point_text.text);
-               
+                } // 
+
+              
                 
                 }
                 
@@ -181,7 +197,7 @@ public void Typing_start() {
                             
            
            
-        } else if( text_i >= value1.Length ) { // i가 value1의 길이보다 크면 UI를 비활성화
+        } else if( text_i >= value1.Length-Quiz_rount ) { // i가 value1의 길이보다 크면 UI를 비활성화
               
             
             Debug.Log("대화 끝");
@@ -209,16 +225,16 @@ public void Typing_start() {
 
           
 
-          if(point == 2) {
-                    //value1.Length의 마지막 값 호출 
-                 int lastElement = value1[value1.Length - 1]; 
-                 m_Message = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
-                 text.text = " 정답은 : " + m_Message;
-                 Debug.Log("정답");
-                }
+          // if(point == 2) {
+          //           //value1.Length의 마지막 값 호출 
+          //        int lastElement = value1[value1.Length - 1]; 
+          //        m_Message = LanguageSingleton.instance.Langs[lang].value[lastElement].Replace("/", "\n");
+          //        text.text = " 정답은 : " + m_Message;
+          //        Debug.Log("정답");
+          //       }
 
-                else 
-                {
+          //       else 
+          //       {
                     for (int a = 0; a < message.Length; a++) // 0부터 message의 길이만큼 반복
                       {   
                         if(!istyping)
@@ -230,7 +246,7 @@ public void Typing_start() {
                        yield return new WaitForSeconds(speed); // speed만큼 대기
                       }
 
-                }
+                // }
   
             
         
@@ -370,6 +386,7 @@ public void Typing_start() {
           tmpInputFields.gameObject.SetActive(true);
           m_Message2 = LanguageSingleton.instance.Langs[lang].langLocalize;
          text2.text =  m_Message2;
+         Quiz_rount = 1;
 
            AudioPlaya(1);
 
@@ -398,7 +415,7 @@ public void Typing_start() {
             Debug.Log("정답");
              istyping = false;
             point_text.text = "획득 가능 포인트 : " + point;
-            Corrects = true;
+            Quizing = true;
             text.text = "정답입니다. 3초후 메인화면으로 돌아갑니다";
             //3초후 메인화면으로 돌아감
             isStart = false;
@@ -412,13 +429,22 @@ public void Typing_start() {
         {
             Debug.Log("오답");
             point -= 4;
-            Corrects = false;
+            Quizing = true;
             point_text.text = "획득 가능 포인트 : " + point;
             text.text = "오답입니다.";
              isStart = false;
             StopCoroutine(Timeset(Quiztime)); 
             answer = false;
-            Invoke("Typing_start", 5f);
+            if(point >=1){
+              Invoke("Typing_start", 5f);
+            }
+            else
+            {   
+                point = 2;
+                point_text.text = "최종 획득 가능 포인트 : " + point;
+              Invoke("Reset", 5f);
+            }
+            
              
            
         }
